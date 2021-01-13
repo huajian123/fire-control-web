@@ -9,9 +9,17 @@ nz-layout {
   box-shadow: 2px 0 6px rgba(0,21,41,.35);
 }
 
+:host ::ng-deep {
+  .dark-top-nav-bg{
+    background: #001529;
+    color: #ffffff!important;
+    .ant-badge{
+      color: #ffffff!important;
+    }
+  }
+}
 
 
-
-.colorWeak {
+.color-weak {
   filter: invert(80%)!important;
 }

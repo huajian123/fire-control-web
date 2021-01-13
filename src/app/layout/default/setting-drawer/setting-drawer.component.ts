@@ -206,7 +206,7 @@ export class SettingDrawerComponent implements OnInit, OnDestroy {
     this.selOne(mode, this.modes);
     this.themesService.setIsCollapsed(false);
     this._themesOptions.mode = mode.key;
-    this.themesService.setThemesMode(this._themesOptions);
+    this.setThemeOptions();
   }
 
   // 切换主题
@@ -221,6 +221,11 @@ export class SettingDrawerComponent implements OnInit, OnDestroy {
       this._themesOptions.theme = themeItem.key;
       this.themesService.setIsNightTheme(false);
     }
+    this.setThemeOptions();
+  }
+
+  // 设置主题参数
+  setThemeOptions(): void {
     this.themesService.setThemesMode(this._themesOptions);
   }
 
