@@ -1,8 +1,16 @@
-import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import {TinyColumn} from '@antv/g2plot';
+import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone, OnInit} from '@angular/core';
+import {Pie, RingProgress, TinyColumn} from '@antv/g2plot';
 import {TinyArea} from '@antv/g2plot';
 import {Progress} from '@antv/g2plot';
 import {Chart} from '@antv/g2';
+import {inNextTick} from 'ng-zorro-antd/core/util';
+
+interface DataItem {
+  name: string;
+  chinese: number;
+  math: number;
+  english: number;
+}
 
 @Component({
   selector: 'app-analysis',
@@ -13,10 +21,10 @@ import {Chart} from '@antv/g2';
 export class AnalysisComponent implements OnInit, AfterViewInit {
   cardPadding = {padding: '20px 24px 8px'};
   miniBarData = [497, 666, 219, 269, 274, 337, 81, 497, 666, 219, 269];
-  miniAreaData = [264, 417, 438, 887, 309, 397, 550, 575, 563, 430, 525, 592, 492, 467, 513, 546, 983, 340, 539, 243, 226, 192];
+  miniAreaData = [264, 274, 284, 294, 284, 274, 264, 264, 274, 264, 264, 264, 284, 264, 254, 264, 244, 340, 264, 243, 226, 192];
   histogramData = [
     {type: '1月', value: 769},
-    {type: '2月', value: 1161},
+    {type: '2月', value: 769},
     {type: '3月', value: 861},
     {type: '4月', value: 442},
     {type: '5月', value: 555},
@@ -25,23 +33,87 @@ export class AnalysisComponent implements OnInit, AfterViewInit {
     {type: '8月', value: 434},
     {type: '9月', value: 843},
     {type: '10月', value: 840},
-    {type: '11月', value: 1184},
-    {type: '12月', value: 970},
+    {type: '11月', value: 769},
+    {type: '12月', value: 769},
+  ];
+  ringData = [
+    {type: '分类一', value: 27},
+    {type: '分类二', value: 25},
+    {type: '分类三', value: 18},
+    {type: '分类四', value: 15},
+    {type: '分类五', value: 10},
+    {type: '其他', value: 5},
   ];
 
-  constructor(private cdr: ChangeDetectorRef) {
+
+  listOfColumn = [
+    {
+      title: '排名',
+      compare: null,
+      priority: false
+    },
+    {
+      title: '搜索关键词',
+      compare: (a: DataItem, b: DataItem) => a.chinese - b.chinese,
+      priority: 3
+    },
+    {
+      title: '用户数',
+      compare: (a: DataItem, b: DataItem) => a.math - b.math,
+      priority: 2
+    },
+    {
+      title: '周涨幅',
+      compare: (a: DataItem, b: DataItem) => a.english - b.english,
+      priority: 1
+    }
+  ];
+  listOfData: DataItem[] = [
+    {
+      name: 'John Brown',
+      chinese: 98,
+      math: 60,
+      english: 70
+    },
+    {
+      name: 'John Brown',
+      chinese: 98,
+      math: 60,
+      english: 70
+    },
+    {
+      name: 'Jim Green',
+      chinese: 98,
+      math: 66,
+      english: 89
+    },
+    {
+      name: 'Joe Black',
+      chinese: 98,
+      math: 90,
+      english: 70
+    },
+    {
+      name: 'Jim Red',
+      chinese: 88,
+      math: 99,
+      english: 89
+    }
+  ];
+
+  constructor(private cdr: ChangeDetectorRef, private ngZone: NgZone) {
   }
 
   ngOnInit(): void {
   }
 
   initMinibar(): void {
-    const dataa = this.miniBarData;
+    const data = this.miniBarData;
     const tinyColumn = new TinyColumn('miniBar', {
       autoFit: true,
       height: 14,
       width: 200,
-      data: dataa,
+      data,
     });
 
     tinyColumn.render();
@@ -105,8 +177,6 @@ export class AnalysisComponent implements OnInit, AfterViewInit {
     chart.interaction('element-active');
 
     chart.legend(false);
-    // todo
-    // @ts-ignore
     chart
       .interval()
       .position('type*value')
@@ -117,24 +187,96 @@ export class AnalysisComponent implements OnInit, AfterViewInit {
         return '#2194ff';
       })
       .label('value', {
-       /* content: (originData) => {
-          const val = parseFloat(originData.value);
-          if (val < 0.05) {
-            return (val * 100).toFixed(1) + '%';
-          }
-          return 0;
-        },*/
         offset: 10,
       });
     chart.render();
   }
 
+  initSearchArea(): void {
+    const data = this.miniAreaData;
+    const tinyArea = new TinyArea('searchUserChart', {
+      autoFit: true,
+      height: 30,
+      data,
+      smooth: true,
+      areaStyle: {
+        fill: '#d6e3fd',
+      },
+    });
+    tinyArea.render();
+  }
+
+  initSearchAvgArea(): void {
+    const data = this.miniAreaData;
+    const tinyArea = new TinyArea('searchUserAvgChart', {
+      autoFit: true,
+      height: 30,
+      data,
+      smooth: true,
+      areaStyle: {
+        fill: '#d6e3fd',
+      },
+    });
+    tinyArea.render();
+  }
+
+  initRing(): void {
+    const tinyArea = new Pie('ringPie', {
+      appendPadding: 10,
+      data: this.ringData,
+      angleField: 'value',
+      colorField: 'type',
+      radius: 1,
+      innerRadius: 0.64,
+      meta: {
+        value: {
+          formatter: (v) => `${v} ¥`,
+        },
+      },
+      label: {
+        type: 'inner',
+        offset: '-50%',
+        style: {
+          textAlign: 'center',
+        },
+        autoRotate: false,
+        content: '{value}',
+      },
+      statistic: {},
+      // 添加 中心统计文本 交互
+      interactions: [{type: 'element-selected'}, {type: 'element-active'}, {type: 'pie-statistic-active'}],
+    });
+    tinyArea.render();
+  }
+
+
+  initMiniRing(): void {
+    const ringProgress = new RingProgress('miniRing', {
+      height: 45,
+      width: 45,
+      autoFit: false,
+      percent: 0.7,
+      color: ['#5B8FF9', '#E8EDF3'],
+    });
+
+    ringProgress.render();
+  }
+
   ngAfterViewInit(): void {
-    setTimeout(() => {
-      this.initMinibar();
-      this.initMiniArea();
-      this.initProgress();
-      this.initHistogram();
+    inNextTick().subscribe(() => {
+
+      this.ngZone.runOutsideAngular(() => {
+        this.initMinibar();
+        this.initMiniArea();
+        this.initProgress();
+        this.initHistogram();
+        this.initSearchArea();
+        this.initSearchAvgArea();
+        this.initRing();
+        this.initMiniRing();
+      });
+
     });
   }
+
 }

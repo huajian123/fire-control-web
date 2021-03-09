@@ -21,6 +21,7 @@ export class StepComponent implements OnInit {
     type: 'info-circle',
     theme: 'twotone'
   };
+  currentStep = 1;
 
   submitForm(): void {
     // tslint:disable-next-line:forin
@@ -61,10 +62,8 @@ export class StepComponent implements OnInit {
       phoneNumber: [null, [Validators.required]],
       website: [null, [Validators.required]],
       captcha: [null, [Validators.required]],
-      title: [false],
+      title: [null],
       payWay: ['zhifubao'],
-
-
     });
   }
 }

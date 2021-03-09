@@ -1,10 +1,11 @@
-import {Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy, Input} from '@angular/core';
-import {filter, map, mergeMap, tap} from 'rxjs/operators';
+import {Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy} from '@angular/core';
+import {filter, map, mergeMap, switchMap, takeUntil, tap} from 'rxjs/operators';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
-import {TabService} from '../../../core/services/tab.service';
+import {TabService} from '../../../core/services/common/tab.service';
 import {ThemeService} from '../../../core/services/store/theme.service';
-import {Subscription} from 'rxjs';
+import { Subject, Subscription} from 'rxjs';
 import * as _ from 'lodash';
+import {ActionCode} from '../../../configs/actionCode';
 
 interface Menu {
   path?: string;
@@ -13,21 +14,23 @@ interface Menu {
   open?: boolean;
   selected?: boolean;
   children?: Menu[];
+  actionCode?: string;
 }
 
 @Component({
   selector: 'app-nav-bar',
   templateUrl: './nav-bar.component.html',
-  styleUrls: ['./nav-bar.component.less'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NavBarComponent implements OnInit, OnDestroy {
+  private destory$ = new Subject<void>();
   menus: Menu[] = [
     {
       title: 'Dashboard',
       icon: 'dashboard',
       open: false,
       selected: false,
+      actionCode: ActionCode.Dashboard,
       children: [
         {
           title: '分析页',
@@ -54,24 +57,25 @@ export class NavBarComponent implements OnInit, OnDestroy {
       icon: 'form',
       open: false,
       selected: false,
+      actionCode: ActionCode.FormModule,
       children: [
         {
           title: '基础表单',
           open: false,
           selected: false,
-          path: '/default/form/base',
+          path: '/default/form/base-form',
         },
         {
           title: '分布表单',
           open: false,
           selected: false,
-          path: '/default/form/step',
+          path: '/default/form/step-form',
         },
         {
           title: '高级表单',
           open: false,
           selected: false,
-          path: '/default/form/advanced',
+          path: '/default/form/advanced-form',
         },
       ]
     },
@@ -80,30 +84,31 @@ export class NavBarComponent implements OnInit, OnDestroy {
       icon: 'table',
       open: false,
       selected: false,
+      actionCode: ActionCode.ListModule,
       children: [
         {
           title: '搜索列表',
           open: false,
           selected: false,
-          path: '',
+          path: '/list/search-list',
           children: [
             {
               title: '搜索列表(文章）',
               open: false,
               selected: false,
-              path: '',
+              path: '/list/search-list/acticle',
             },
             {
               title: '搜索列表(项目)',
               open: false,
               selected: false,
-              path: '',
+              path: '/list/search-list/project',
             },
             {
               title: '搜索列表(应用)',
               open: false,
               selected: false,
-              path: '',
+              path: '/list/search-list/app',
             },
           ]
         },
@@ -111,19 +116,19 @@ export class NavBarComponent implements OnInit, OnDestroy {
           title: '查询表格',
           open: false,
           selected: false,
-          path: '',
+          path: '/default/list/search-table',
         },
         {
           title: '标准表格',
           open: false,
           selected: false,
-          path: '',
+          path: '/custom-table',
         },
         {
           title: '卡片列表',
           open: false,
           selected: false,
-          path: '',
+          path: '/card-table',
         },
       ]
     },
@@ -132,18 +137,19 @@ export class NavBarComponent implements OnInit, OnDestroy {
       icon: 'profile',
       open: false,
       selected: false,
+      actionCode: ActionCode.DetailModule,
       children: [
         {
           title: '基础详情页',
           open: false,
           selected: false,
-          path: '',
+          path: '/detail-base',
         },
         {
           title: '高级详情页',
           open: false,
           selected: false,
-          path: '',
+          path: '/detail-adv',
         },
       ]
     },
@@ -152,18 +158,19 @@ export class NavBarComponent implements OnInit, OnDestroy {
       icon: 'check-circle',
       open: false,
       selected: false,
+      actionCode: ActionCode.ResultModule,
       children: [
         {
           title: '成功页',
           open: false,
           selected: false,
-          path: '',
+          path: '/default/result/success',
         },
         {
           title: '失败页',
           open: false,
           selected: false,
-          path: '',
+          path: '/default/result/fail',
         },
       ]
     },
@@ -172,24 +179,25 @@ export class NavBarComponent implements OnInit, OnDestroy {
       icon: 'warning',
       open: false,
       selected: false,
+      actionCode: ActionCode.ErrorModule,
       children: [
         {
           title: '403',
           open: false,
           selected: false,
-          path: '',
+          path: '/default/except/except403',
         },
         {
           title: '404',
           open: false,
           selected: false,
-          path: '',
+          path: '/default/except/except404',
         },
         {
           title: '500',
           open: false,
           selected: false,
-          path: '',
+          path: '/default/except/except500',
         },
       ]
     },
@@ -198,44 +206,49 @@ export class NavBarComponent implements OnInit, OnDestroy {
       icon: 'user',
       open: false,
       selected: false,
+      actionCode: ActionCode.PersonalModule,
       children: [
         {
           title: '个人中心',
           open: false,
           selected: false,
-          path: '',
+          path: '/default/personal/personal-center',
         },
         {
           title: '个人设置',
           open: false,
           selected: false,
-          path: '',
+          path: '/default/personal/personal-setting',
         },
       ]
     },
     {
-      title: '图形编辑器',
+      title: '内部管理',
       icon: 'highlight',
       open: false,
       selected: false,
+      actionCode: ActionCode.InternalModule,
       children: [
         {
-          title: '流程编辑器',
+          title: '用户管理',
           open: false,
           selected: false,
-          path: '',
+          path: '/default/internal-manage/user-manage',
+          actionCode: ActionCode.UserManage,
         },
         {
-          title: '脑图编辑器',
+          title: '角色管理',
           open: false,
           selected: false,
-          path: '',
+          path: '/default/internal-manage/role-manage',
+          actionCode: ActionCode.Role,
         },
         {
-          title: '拓扑编辑器',
+          title: '部门管理',
           open: false,
           selected: false,
-          path: '',
+          path: '/default/internal-manage/dept-manage',
+          actionCode: ActionCode.Dept,
         },
       ]
     },
@@ -244,6 +257,8 @@ export class NavBarComponent implements OnInit, OnDestroy {
   themesOptions$ = this.themesService.getThemesMode();
   themesMode = 'side';
   isCollapsed$ = this.themesService.getIsCollapsed();
+  isOverMode$ = this.themesService.getIsOverMode();
+  isOverMode = false;
   isCollapsed = false;
   subs: Array<Subscription> = [];
   copyMenus: Menu[] = _.cloneDeep(this.menus);
@@ -254,21 +269,22 @@ export class NavBarComponent implements OnInit, OnDestroy {
     this.subs[0] = this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),
+        takeUntil(this.destory$),
         tap(() => {
           // todo
           // @ts-ignore
           this.routerPath = this.activatedRoute.snapshot['_routerState'].url;
           this.clickMenuItem(this.menus);
           this.clickMenuItem(this.copyMenus);
-          // 是折叠的菜单
-          if (this.isCollapsed) {
+          // 是折叠的菜单并且不是over菜单
+          if (this.isCollapsed && !this.isOverMode) {
             this.closeMenuOpen(this.menus);
           } else {
             // this.menus = this.copyMenus;
           }
 
-          if(this.themesMode==='top'){
-           this.closeMenu();
+          if (this.themesMode === 'top' && !this.isOverMode) {
+            this.closeMenu();
           }
         }),
         map(() => this.activatedRoute),
@@ -286,7 +302,11 @@ export class NavBarComponent implements OnInit, OnDestroy {
         }),
       )
       .subscribe((routeData) => {
-        this.tabService.addTab({title: routeData['title'], path: this.routerPath});
+        this.tabService.addTab({
+          title: routeData['title'],
+          path: this.routerPath,
+          relatedLink: routeData['relatedLink'] ? routeData['relatedLink'] : []
+        });
         this.tabService.findIndex(this.routerPath);
       });
   }
@@ -302,7 +322,8 @@ export class NavBarComponent implements OnInit, OnDestroy {
       item.selected = false;
       // 一级菜单
       if (!item.children || item.children.length === 0) {
-        if (item.path === routePath) {
+        // if (item.path === routePath) {
+        if (routePath.includes(item.path!)) {
           item.selected = true;
         }
         continue;
@@ -312,7 +333,8 @@ export class NavBarComponent implements OnInit, OnDestroy {
         subItem.selected = false;
         subItem.open = false;
         if (!subItem.children || subItem.children?.length === 0) {
-          if (subItem.path === routePath) {
+          // if (subItem.path === routePath) {
+          if (routePath.includes(subItem.path!)) {
             item.open = true;
             item.selected = true;
             subItem.selected = true;
@@ -321,7 +343,8 @@ export class NavBarComponent implements OnInit, OnDestroy {
           continue;
         }
         for (const thirdItem of subItem.children) {
-          if (thirdItem.path === routePath) {
+          // if (thirdItem.path === routePath) {
+          if (routePath.includes(thirdItem.path!)) {
             item.open = true;
             item.selected = true;
             subItem.selected = true;
@@ -373,20 +396,24 @@ export class NavBarComponent implements OnInit, OnDestroy {
     });
   }
 
-  closeMenu():void{
+  closeMenu(): void {
     this.clickMenuItem(this.menus);
     this.clickMenuItem(this.copyMenus);
     this.closeMenuOpen(this.menus);
   }
 
   subThemesSettings(): void {
-    this.themesOptions$.subscribe(options => {
+    this.isOverMode$.pipe(switchMap(res => {
+      this.isOverMode = res;
+      return this.themesOptions$;
+    })).subscribe(options => {
       this.themesMode = options.mode;
-      if(this.themesMode==='top'){
+      if (this.themesMode === 'top' && !this.isOverMode) {
         this.closeMenu();
       }
-    })
+    });
   }
+
 
   ngOnInit(): void {
     this.subIsCollapsed();
@@ -394,6 +421,7 @@ export class NavBarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subs.forEach(s => s.unsubscribe());
+    this.destory$.next();
+    this.destory$.complete();
   }
 }

@@ -1,18 +1,21 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
-  EventEmitter,
+  ElementRef,
   HostListener,
   Inject,
-  Input,
   OnDestroy,
   OnInit,
-  Output
+  Renderer2,
 } from '@angular/core';
 import {Subject} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
+import {take, takeUntil} from 'rxjs/operators';
 import {DOCUMENT} from '@angular/common';
 import {SettingInterface, ThemeService} from '../../../core/services/store/theme.service';
+import {ThemeSkinService} from '../../../core/services/common/theme-skin.service';
+import {WindowService} from '../../../core/services/common/window.service';
+import {IsNightKey, ThemeOptionsKey} from '../../../configs/constant';
 
 interface NormalModel {
   image?: string;
@@ -21,7 +24,7 @@ interface NormalModel {
 }
 
 interface Theme extends NormalModel {
-  key: 'dark' | 'light' | 'night';
+  key: 'dark' | 'light';
 }
 
 interface Color extends NormalModel {
@@ -66,12 +69,6 @@ export class SettingDrawerComponent implements OnInit, OnDestroy {
       key: 'light',
       image: '/assets/imgs/theme-light.svg',
       title: '亮色菜单风格',
-      isChecked: false,
-    },
-    {
-      key: 'night',
-      image: '/assets/imgs/theme-dark.svg',
-      title: '黑夜模式风格',
       isChecked: false,
     },
   ];
@@ -149,7 +146,9 @@ export class SettingDrawerComponent implements OnInit, OnDestroy {
     }
   ];
 
-  constructor(private themesService: ThemeService, @Inject(DOCUMENT) private doc: Document) {
+  constructor(private themesService: ThemeService, @Inject(DOCUMENT) private doc: Document,
+              private themeSkinService: ThemeSkinService, private windowServe: WindowService,
+              private cdr: ChangeDetectorRef, private el: ElementRef, private rd2: Renderer2) {
   }
 
   @HostListener('click', ['$event'])
@@ -157,42 +156,11 @@ export class SettingDrawerComponent implements OnInit, OnDestroy {
     this.isCollapsed = !this.isCollapsed;
   }
 
-  // 切换到黑暗主题
-  changeThemeToNight(): void {
-    this.addCss('./assets/themes/style.dark.css', 'dark-theme');
-  }
-
-  addCss(path: string, id: string): void {
-    const doms = this.doc.getElementById(id);
-    if (doms) {
-      return;
-    }
-    const themeUrl = path;
-    // create new link element
-    const style = this.doc.createElement('link') as HTMLLinkElement;
-    // put the link into the document head
-    style.type = 'text/css';
-    style.rel = 'stylesheet';
-    style.id = id;
-    style.href = themeUrl;
-    this.doc.body.appendChild(style);
-  }
-
-  removeCss(select: string): void {
-    const doms = this.doc.querySelectorAll(select);
-    if (doms && doms.length > 0) {
-      doms.forEach((dom) => dom.remove());
-    }
-  }
-
-  removeNightTheme(): void {
-    this.removeCss('#dark-theme');
-  }
-
-  // 切换主题色
-  changePrimaryColor(colorItem: Color): void {
-    this.selOne(colorItem, this.colors);
-    this.addCss('./assets/themes/style.red.css', 'primary-red');
+  // 修改黑夜主题
+  changeNightTheme(isNight: boolean): void {
+    this.windowServe.setStorage(IsNightKey, '' + isNight);
+    this.themesService.setIsNightTheme(isNight);
+    this.themeSkinService.toggleTheme().then();
   }
 
   // 选择一个isChecked为true,其他为false
@@ -212,26 +180,67 @@ export class SettingDrawerComponent implements OnInit, OnDestroy {
   // 切换主题
   changeTheme(themeItem: Theme): void {
     this.selOne(themeItem, this.themes);
-    if (themeItem.key === 'night') {
-      this.changeThemeToNight();
-      this._themesOptions.theme = 'dark';
-      this.themesService.setIsNightTheme(true);
-    } else {
-      this.removeNightTheme();
-      this._themesOptions.theme = themeItem.key;
-      this.themesService.setIsNightTheme(false);
-    }
+    this._themesOptions.theme = themeItem.key;
     this.setThemeOptions();
   }
 
   // 设置主题参数
   setThemeOptions(): void {
     this.themesService.setThemesMode(this._themesOptions);
+    this.windowServe.setStorage(ThemeOptionsKey, JSON.stringify(this._themesOptions));
+  }
+
+
+  // 修改色弱模式
+  changeWeakMode(e: boolean): void {
+    const name = this.doc.getElementsByTagName('html');
+    if (e) {
+      this.rd2.addClass(name[0], 'color-weak');
+    } else {
+      this.rd2.removeClass(name[0], 'color-weak');
+    }
+    this._themesOptions.colorWeak = e;
+    this.setThemeOptions();
   }
 
   ngOnInit(): void {
-    this.themesOptions$.pipe(takeUntil(this.destory$)).subscribe((res: SettingInterface) => this._themesOptions = res);
-    // this.isNightTheme$.pipe(takeUntil(this.destory$)).subscribe((res: boolean) => this._isNightTheme = res);
+    // todo 代码有待精简
+    const isNightCash = this.windowServe.getStorage(IsNightKey);
+    if (!!isNightCash) {
+      const jsonParseIsNight: boolean = JSON.parse(isNightCash);
+      if (jsonParseIsNight) {
+        this.changeNightTheme(jsonParseIsNight);
+      }
+      this._isNightTheme = jsonParseIsNight;
+    } else {
+      this.isNightTheme$.pipe(takeUntil(this.destory$), take(1)).subscribe((res: boolean) => {
+        this._isNightTheme = res;
+      });
+    }
+
+
+    const themeOptionsCash = this.windowServe.getStorage(ThemeOptionsKey);
+    if (!!themeOptionsCash) {
+      this._themesOptions = JSON.parse(themeOptionsCash);
+      this.setThemeOptions();
+    } else {
+      this.themesOptions$.pipe(takeUntil(this.destory$), take(1)).subscribe((res: SettingInterface) => {
+        this._themesOptions = res;
+      });
+    }
+
+    this.changeWeakMode(this._themesOptions.colorWeak);
+
+
+    this.modes.forEach((item) => {
+      item.isChecked = item.key === this._themesOptions.mode;
+    });
+
+    this.themes.forEach((item) => {
+      item.isChecked = item.key === this._themesOptions.theme;
+    });
+
+    this.cdr.markForCheck();
   }
 
   ngOnDestroy(): void {

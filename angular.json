@@ -58,8 +58,20 @@
               }
             ],
             "styles": [
-              "src/assets/styles/index.less"
+              {
+                "input": "src/styles/default.less",
+                "bundleName": "default",
+                "inject": false
+              },
+              {
+                "input": "src/styles/dark.less",
+                "bundleName": "dark",
+                "inject": false
+              }
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": ["src/styles/themes"]
+            },
             "scripts": [],
             "allowedCommonJsDependencies": [
               "@antv/g2",
@@ -70,7 +82,16 @@
               "@antv/util",
               "size-sensor",
               "@antv/g-canvas",
-              "lodash"
+              "@antv/l7-component",
+              "inversify-inject-decorators",
+              "@babel/runtime/helpers/wrapNativeSuper",
+              "merge-json-schemas",
+              "@mapbox/geojson-rewind",
+              "lodash",
+              "inversify",
+              "@babel/runtime/helpers/slicedToArray",
+              "@babel/runtime/helpers/objectWithoutProperties",
+              "qs"
             ]
           },
           "configurations": {
@@ -91,13 +112,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "2mb",
+                  "maximumError": "6mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
                 }
               ]
             }
@@ -106,7 +127,8 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "fire-control-web:build"
+            "browserTarget": "fire-control-web:build",
+            "proxyConfig": "proxy.conf.json"
           },
           "configurations": {
             "production": {

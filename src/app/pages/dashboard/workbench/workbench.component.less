@@ -1,8 +1,42 @@
 
-.phone-select {
-  width: 70px;
+img {
+  width: 72px;
 }
 
-.register-are {
-  margin-bottom: 8px;
+:host ::ng-deep {
+  .ant-statistic {
+    text-align: right;
+  }
+}
+
+@media (max-width: 820px) {
+  .mini-screen {
+    display: block;
+  }
+
+  :host ::ng-deep {
+    .ant-statistic {
+      margin-top: 10px;
+      text-align: left;
+      max-width: 100px;
+    }
+  }
+}
+
+.card-foot {
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.group {
+  display: block;
+  height: 24px;
+  margin: 12px 0;
+  // color: rgba(0,0,0,.85);
+  transition: all .3s;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  word-break: break-all;
 }

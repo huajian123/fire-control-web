@@ -1,0 +1,345 @@
+@import "../minireset.less";
+
+@layout-header-padding: 0;
+
+// 如果存在所有主题通用的样式变量,基本样式文件并在每个主题样式定制文件中引入它：
+* {
+  box-sizing: border-box;
+}
+
+
+body {
+  // min-width: 570px;
+}
+
+
+img {
+  display: inline-block;
+  width: 100%;
+}
+
+
+p {
+  margin: 0;
+  padding: 0;
+}
+
+
+audio, video {
+  outline: none;
+}
+
+input:focus {
+  outline: none;
+}
+
+a {
+  color: inherit;
+
+  &:hover {
+    color: inherit;
+    // text-decoration: underline;
+  }
+}
+
+.pagination a:hover {
+  text-decoration: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 0;
+}
+
+.none {
+  display: none;
+}
+
+
+.full-height {
+  height: 100%;
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-wrap: normal;
+}
+
+.clearfix:after {
+  clear: both;
+  content: '.';
+  display: block;
+  height: 0;
+  visibility: hidden;
+}
+
+.color-weak {
+  filter: invert(80%) !important;
+}
+
+
+.wrap {
+  width: 980px;
+  margin: 0 auto;
+}
+
+
+.text-left {
+  text-align: left !important;;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.text-right {
+  text-align: right !important;;
+}
+
+.pull-left {
+  float: left;
+}
+
+.pull-right {
+  float: right;
+}
+
+.m-r-8 {
+  margin-right: 8px !important;
+}
+
+.m-r-25 {
+  margin-right: 25px !important;
+}
+
+.m-r-30 {
+  margin-right: 30px !important;
+}
+
+.m-0 {
+  margin: 0 !important;
+}
+.m-b-5 {
+  margin-bottom: 5px !important;
+}
+
+.m-b-8 {
+  margin-bottom: 8px !important;
+}
+
+.m-b-10 {
+  margin-bottom: 10px !important;
+}
+
+.m-b-20 {
+  margin-bottom: 20px !important;
+}
+
+.m-b-30 {
+  margin-bottom: 30px !important;
+}
+
+
+.m-l-5 {
+  margin-left: 5px !important;
+}
+
+.m-l-7 {
+  margin-left: 7px !important;
+}
+
+
+.m-l-10 {
+  margin-left: 10px !important;
+}
+
+
+.m-l-15 {
+  margin-left: 15px !important;
+}
+
+
+.m-t-5 {
+  margin-top: 5px !important;
+}
+
+.m-t-8 {
+  margin-top: 8px !important;
+}
+
+.m-t-10 {
+  margin-top: 10px !important;
+}
+
+.m-t-15 {
+  margin-top: 15px !important;
+}
+
+.m-t-20 {
+  margin-top: 20px !important;
+}
+
+.m-t-25 {
+  margin-top: 25px !important;
+}
+
+.m-t-30 {
+  margin-top: 30px !important;
+}
+
+
+.m-l-18 {
+  margin-left: 18px !important;
+}
+
+.m-l-20 {
+  margin-left: 20px !important;
+}
+
+.m-l-25 {
+  margin-left: 25px !important;
+}
+
+.m-l-50 {
+  margin-left: 50px !important;
+}
+
+
+.p-0 {
+  padding: 0 !important;
+}
+
+.p-l-0 {
+  padding-left: 0 !important;
+}
+
+.p-l-10 {
+  padding-left: 10px !important;
+}
+
+.p-l-25 {
+  padding-left: 25px !important;
+}
+
+
+.p-l-35 {
+  padding-left: 35px !important;
+}
+
+.p-r-10 {
+  padding-right: 10px !important;
+}
+
+.p-b-0 {
+  padding-bottom: 0 !important;
+}
+
+.p-b-50 {
+  padding-bottom: 50px !important;
+}
+
+.clear-fix:after {
+  content: '';
+  clear: both;
+  display: block;
+}
+
+.with-full {
+  width: 100%;
+}
+
+.default-theme {
+  background: #ffffff;
+}
+
+.night-theme {
+  background: #141414;
+}
+
+.d-i-b {
+  display: inline-block !important;
+}
+
+.hand-model {
+  cursor: pointer;
+}
+
+.text-error{color:#f5222d!important}
+
+.operate-text {
+  .hand-model;
+  color: #409eff;
+  margin-right: 5px;
+}
+
+.center-row {
+  margin: 0 auto;
+}
+
+.center-fn(@col:center,@row:center) {
+  display: flex;
+  justify-content: @col;
+  align-items: @row;
+}
+
+.center {
+  display: flex;
+  .center-fn()
+}
+
+.left-start-center{
+  .center-fn(flex-start)
+}
+
+.bg-color-no {
+  background: none !important;
+}
+
+.collapse {
+  margin-left: 8px;
+  font-size: 12px;
+}
+
+.content-wrap {
+  width: 100%;
+  padding: 24px;
+}
+
+// 通用页面统一布局
+.normal-table-wrap {
+  margin: 27px 27px 0;
+
+  /*列表顶部样式*/
+
+  .ant-pro-table-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .ant-pro-table-toolbar-title {
+      flex: 1 1;
+      font-size: 16px;
+      line-height: 24px;
+      opacity: .85;
+    }
+
+    .ant-pro-table-toolbar-option {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .ant-pro-table-toolbar-default-option {
+      .ant-space-item:last-child {
+        margin-right: 5px !important;
+      }
+    }
+  }
+
+  // 表单样式
+  .form-wrap {
+    padding: 24px;
+  }
+}
+

@@ -1,0 +1,45 @@
+<!--头部版块-->
+<app-page-header [pageHeaderInfo]="pageHeaderInfo"></app-page-header>
+
+<div class="normal-table-wrap">
+  <app-card-table-wrap [actionCode]="actionCodeObj" [needAddBtn]="true" (add)="add()">
+    <nz-table nzShowPagination="false" nzSize="small" nzBordered nzTableLayout="fixed" [nzData]="dataList">
+      <thead>
+      <tr>
+        <th>部门名称</th>
+        <th>操作</th>
+      </tr>
+      </thead>
+      <tbody>
+      <ng-container *ngFor="let item of dataList">
+        <tr>
+          <td [nzShowExpand]="item.departmentVos.length>0"
+              [(nzExpand)]="item.expand"
+              (nzExpandChange)="collapse($event,item)"
+          >{{item.departmentName}}</td>
+          <td>
+            <ng-container *ngTemplateOutlet="operationTpl;context:item"></ng-container>
+          </td>
+        </tr>
+        <ng-container *ngIf="item.departmentVos.length>0&&item.expand">
+          <tr *ngFor="let secondItem of item.departmentVos;">
+            <td [nzIndentSize]="secondItem.departmentGrade! * 5">
+              {{secondItem.departmentName}}
+            </td>
+            <td>
+              <ng-container *ngTemplateOutlet="operationTpl;context:secondItem"></ng-container>
+            </td>
+          </tr>
+        </ng-container>
+      </ng-container>
+      </tbody>
+    </nz-table>
+
+  </app-card-table-wrap>
+</div>
+<ng-template #operationTpl let-id="id" let-departmentVos="departmentVos" let-departmentGrade="departmentGrade"
+             let-fatherId="fatherId">
+  <span class="operate-text" (click)="edit(id,departmentGrade)">编辑</span>
+  <span class="operate-text" (click)="del(id,departmentVos)">删除</span>
+  <span class="operate-text" (click)="add(departmentGrade,id)">添加下级</span>
+</ng-template>

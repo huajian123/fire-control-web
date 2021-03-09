@@ -1,3 +1,5 @@
+import {FormGroup} from '@angular/forms';
+
 const fnGetFile = function getFile(url: string, isBlob = false): Promise<any> {
   return new Promise((resolve, reject) => {
     const client = new XMLHttpRequest();
@@ -21,7 +23,28 @@ const fnGetFile = function getFile(url: string, isBlob = false): Promise<any> {
   });
 };
 
+const fnCheckForm = function checkForm(form: FormGroup): boolean {
+  Object.keys(form.controls).forEach(key => {
+    form.controls[key].markAsDirty();
+    form.controls[key].updateValueAndValidity();
+  });
+  return !form.invalid;
+};
+
+const fnStopMouseEvent = function stopMouseEvent(e: MouseEvent): void {
+  e.stopPropagation();
+  e.preventDefault();
+};
+
+// 获取路由最后一个/后面的字符串
+const fnFormatePath = function formatePath(path: string): string {
+  const newpath = path.replace(/\/[0-9]+/g, '');
+  return newpath.substring(newpath.lastIndexOf('\/') + 1);
+};
 
 export {
-  fnGetFile
+  fnGetFile,
+  fnCheckForm,
+  fnStopMouseEvent,
+  fnFormatePath
 };

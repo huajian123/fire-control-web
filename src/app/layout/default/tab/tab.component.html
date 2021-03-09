@@ -1,13 +1,8 @@
-<nz-tabset nzLinkRouter [nzSelectedIndex]="currentIndex"
-           [nzTabBarStyle]="{'margin':'10px 0 0 0','background':(isNightTheme$|async)?'':'#fff'}"
-           [nzTabPosition]="'top'" [nzType]="'card'">
-  <nz-tab *ngFor="let tab of tabs;let i =index;trackBy:trackByTab;">
-
-    <a *nzTabLink nz-tab-link [routerLink]="tab.path" (contextmenu)="contextMenu($event, menu)">
-      {{ tab.title}}
-      <i nz-icon nzType="close" (click)="closeTab(tab,$event,i)" class="ant-tabs-close-x"></i>
-    </a>
-
+<nz-tabset (nzClose)="clickCloseIcon($event)" [nzSelectedIndex]="currentIndex"
+           [nzTabBarStyle]="{'margin':'10px 0 0 0','height':'35px','background':(isNightTheme$|async)?'':'#fff'}"
+           [nzTabPosition]="'top'" [nzType]="'editable-card'" [nzHideAdd]="true">
+  <nz-tab (nzClick)="goPage(tab)" nzClosable (nzContextmenu)="contextMenu($event, menu)" [nzTitle]="tab.title"
+          *ngFor="let tab of tabs;let i =index;trackBy:trackByTab;">
     <nz-dropdown-menu #menu="nzDropdownMenu">
       <ul nz-menu>
         <li nz-menu-item [nzDisabled]="tabs.length-1===0" (click)="closeTab(tab,$event,i)">关闭标签</li>

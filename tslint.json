@@ -16,6 +16,7 @@
     "deprecation": {
       "severity": "warning"
     },
+    "no-unused-expression": false,
     "eofline": true,
     "no-string-literal": false,
     "import-blacklist": [
@@ -57,7 +58,9 @@
       true,
       "ignore-params"
     ],
-    "no-non-null-assertion": true,
+    "no-non-null-assertion": false,
+    // 禁止非空断言
+    "no-empty-interface": false,
     "no-redundant-jsdoc": true,
     "no-switch-case-fall-through": true,
     "no-var-requires": false,
