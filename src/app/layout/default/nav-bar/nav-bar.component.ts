@@ -254,11 +254,11 @@ export class NavBarComponent implements OnInit, OnDestroy {
     },
     /*考试菜单*/
     {
-      title: '考试管理',
+      title: '考试教育',
       icon: 'aim',
       open: false,
       selected: false,
-      actionCode: ActionCode.ExamManagement,
+      actionCode: ActionCode.ExamEducate,
       children: [
         {
           title: '题库管理',
@@ -270,13 +270,13 @@ export class NavBarComponent implements OnInit, OnDestroy {
           title: '试题管理',
           open: false,
           selected: false,
-          path: '/default/internal-manage/role-manage',
+          path: '/default/exam-management/question-manage',
         },
         {
           title: '考试管理',
           open: false,
           selected: false,
-          path: '/default/internal-manage/dept-manage',
+          path: '/default/exam-management/exam-manage',
         },
       ]
     },
