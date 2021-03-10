@@ -23,6 +23,8 @@ export const ActionCode = {
 
   InternalModule: '0008', /*内部管理*/
 
+  ExamManagement: '0009', /*考试管理*/
+
   Role: '0018', // 角色管理
   RoleAdd: '0118',
   RoleEdit: '0218',

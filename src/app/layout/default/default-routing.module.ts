@@ -36,6 +36,10 @@ const routes: Routes = [
         path: 'result',
         loadChildren: () => import('../../pages/result/result.module').then(m => m.ResultModule)
       },
+      {
+        path: 'exam-management',
+        loadChildren: () => import('../../pages/exam-management/exam-management.module').then(m => m.ExamManagementModule)
+      },
       {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
     ]
   },

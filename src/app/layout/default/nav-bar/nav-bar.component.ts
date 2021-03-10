@@ -3,7 +3,7 @@ import {filter, map, mergeMap, switchMap, takeUntil, tap} from 'rxjs/operators';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {TabService} from '../../../core/services/common/tab.service';
 import {ThemeService} from '../../../core/services/store/theme.service';
-import { Subject, Subscription} from 'rxjs';
+import {Subject, Subscription} from 'rxjs';
 import * as _ from 'lodash';
 import {ActionCode} from '../../../configs/actionCode';
 
@@ -249,6 +249,34 @@ export class NavBarComponent implements OnInit, OnDestroy {
           selected: false,
           path: '/default/internal-manage/dept-manage',
           actionCode: ActionCode.Dept,
+        },
+      ]
+    },
+    /*考试菜单*/
+    {
+      title: '考试管理',
+      icon: 'aim',
+      open: false,
+      selected: false,
+      actionCode: ActionCode.ExamManagement,
+      children: [
+        {
+          title: '题库管理',
+          open: false,
+          selected: false,
+          path: '/default/exam-management/question-bank',
+        },
+        {
+          title: '试题管理',
+          open: false,
+          selected: false,
+          path: '/default/internal-manage/role-manage',
+        },
+        {
+          title: '考试管理',
+          open: false,
+          selected: false,
+          path: '/default/internal-manage/dept-manage',
         },
       ]
     },
